@@ -29,7 +29,7 @@ interface WorkflowState {
   setNodes: (nodes: WorkflowNode[]) => void;
   setEdges: (edges: Edge[]) => void;
   addNode: (node: WorkflowNode) => void;
-  updateNodeData: (id: string, data: any) => void;
+  updateNodeData: (id: string, data: Record<string, unknown>) => void;
   deleteNode: (id: string) => void;
   setSelectedNodeId: (id: string | null) => void;
   validateGraph: () => void;
@@ -44,7 +44,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   onNodesChange: (changes: NodeChange[]) => {
     set({
-      nodes: applyNodeChanges(changes, get().nodes as any) as any as WorkflowNode[],
+      nodes: applyNodeChanges(changes, get().nodes as unknown as import('reactflow').Node[]) as unknown as WorkflowNode[],
     });
     get().validateGraph();
   },
@@ -72,11 +72,11 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     set({ nodes: [...get().nodes, node] });
     get().validateGraph();
   },
-  updateNodeData: (id: string, data: any) => {
+  updateNodeData: (id: string, data: Record<string, unknown>) => {
     set({
       nodes: get().nodes.map((node) => {
         if (node.id === id) {
-          return { ...node, data: { ...node.data, ...data } };
+          return { ...node, data: { ...node.data, ...data } } as WorkflowNode;
         }
         return node;
       }),

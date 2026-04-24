@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useWorkflowStore } from '../../store/workflowStore';
 import { X, Trash2 } from 'lucide-react';
 import { getAutomations } from '../../api/workflowApi';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 const ConfigPanelContent = () => {
   const { nodes, selectedNodeId, updateNodeData, deleteNode, setSelectedNodeId } = useWorkflowStore();
@@ -25,11 +26,7 @@ const ConfigPanelContent = () => {
     }
   }, [selectedNode, reset]);
 
-  if (!selectedNode) {
-    return <div className="w-80 bg-white border-l border-slate-200 h-full p-6 flex flex-col items-center justify-center text-slate-400">Select a node</div>;
-  }
-
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Record<string, unknown>) => {
     if (selectedNodeId) {
       updateNodeData(selectedNodeId, data);
     }
@@ -43,6 +40,10 @@ const ConfigPanelContent = () => {
     });
     return () => subscription.unsubscribe();
   }, [watch, selectedNodeId, updateNodeData]);
+
+  if (!selectedNode) {
+    return <div className="w-80 bg-white border-l border-slate-200 h-full p-6 flex flex-col items-center justify-center text-slate-400">Select a node</div>;
+  }
 
   return (
     <div className="w-80 bg-white border-l border-slate-200 h-full flex flex-col shadow-sm z-10">
@@ -62,7 +63,7 @@ const ConfigPanelContent = () => {
             <label className="text-sm font-medium text-slate-700">Title</label>
             <input 
               {...register('title')} 
-              defaultValue={selectedNode?.data?.title || "Untitled"}
+              defaultValue={(selectedNode?.data as Record<string, unknown>)?.title as string || "Untitled"}
               className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
               placeholder="e.g. Initial Step"
             />
@@ -159,11 +160,10 @@ const ConfigPanelContent = () => {
 };
 
 export const ConfigPanel = () => {
-  try {
-    return <ConfigPanelContent />;
-  } catch (e) {
-    console.error(e);
-    return <div className="w-80 bg-white border-l border-slate-200 h-full p-6 flex flex-col items-center justify-center text-red-500">Error loading panel</div>;
-  }
+  return (
+    <ErrorBoundary>
+      <ConfigPanelContent />
+    </ErrorBoundary>
+  );
 };
 

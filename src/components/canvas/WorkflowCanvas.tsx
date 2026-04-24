@@ -60,7 +60,7 @@ const FlowRenderer = () => {
         y: event.clientY - event.currentTarget.getBoundingClientRect().top,
       });
 
-      const defaultData: any = { title: "New Node" };
+      const defaultData: Record<string, string> = { title: "New Node" };
       if (type === 'task') {
         defaultData.title = "New Task";
         defaultData.description = "";
@@ -89,7 +89,7 @@ const FlowRenderer = () => {
     [addNode, reactFlowInstance]
   );
 
-  const onSelectionChange = useCallback(({ nodes }: { nodes: any[] }) => {
+  const onSelectionChange = useCallback(({ nodes }: { nodes: import('reactflow').Node[] }) => {
     if (nodes.length === 1) {
       setSelectedNodeId(nodes[0].id);
     } else {
@@ -107,7 +107,7 @@ const FlowRenderer = () => {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         onSelectionChange={onSelectionChange}
-        onNodeClick={(event, node) => setSelectedNodeId(node?.id || null)}
+        onNodeClick={(_, node) => setSelectedNodeId(node?.id || null)}
         onPaneClick={() => setSelectedNodeId(null)}
         defaultEdgeOptions={{ 
           type: 'smoothstep', 
